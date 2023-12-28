@@ -7,7 +7,7 @@ var span = document.getElementsByClassName('close')[0];
 // get all project link for shenanigans
 var projectLinks = document.querySelectorAll('.project-link');
 
-// add click event listener to each project link
+// Attach a click event listener to each project link
 projectLinks.forEach(function (link) {
   link.addEventListener('click', function (event) {
     event.preventDefault();
@@ -20,17 +20,26 @@ projectLinks.forEach(function (link) {
 });
 
 // close modal on <span> click
-span.onclick = function () {
-  modal.style.display = 'none';
-};
+span.addEventListener('click', closeTheModal);
+span.addEventListener('touchstart', closeTheModal, { passive: false });
 
 // close modal on click outside
-window.onclick = function (event) {
+window.addEventListener('click', closeTheModalIfOutside);
+window.addEventListener('touchstart', closeTheModalIfOutside, {
+  passive: false,
+});
+
+function closeTheModal() {
+  modal.style.display = 'none';
+}
+
+function closeTheModalIfOutside(event) {
   if (event.target == modal) {
     modal.style.display = 'none';
   }
-};
+}
 
+// draggable modal
 function dragElement(element) {
   var pos1 = 0,
     pos2 = 0,
@@ -38,31 +47,35 @@ function dragElement(element) {
     pos4 = 0;
 
   if (document.getElementById(element.id + 'Header')) {
-    document.getElementById(element.id + 'Header').onmousedown = dragMouseDown;
-    document.getElementById(element.id + 'Header').ontouchstart = dragMouseDown; // for touch/phone devices
+    document
+      .getElementById(element.id + 'Header')
+      .addEventListener('mousedown', dragMouseDown);
+    document
+      .getElementById(element.id + 'Header')
+      .addEventListener('touchstart', dragMouseDown, { passive: false });
   } else {
-    element.onmousedown = dragMouseDown;
-    element.ontouchstart = dragMouseDown; // for touch devices
+    element.addEventListener('mousedown', dragMouseDown);
+    element.addEventListener('touchstart', dragMouseDown, { passive: false });
   }
 
   function dragMouseDown(e) {
     e.preventDefault();
-    if (e.type == 'touchstart') {
+    if (e.type === 'touchstart') {
       pos3 = e.touches[0].clientX;
       pos4 = e.touches[0].clientY;
     } else {
       pos3 = e.clientX;
       pos4 = e.clientY;
     }
-    document.onmouseup = closeDragElement;
-    document.ontouchend = closeDragElement; // for touch devices
-    document.onmousemove = elementDrag;
-    document.ontouchmove = elementDrag; // for touch devices
+    document.addEventListener('mouseup', closeDragElement);
+    document.addEventListener('touchend', closeDragElement, { passive: false });
+    document.addEventListener('mousemove', elementDrag);
+    document.addEventListener('touchmove', elementDrag, { passive: false });
   }
 
   function elementDrag(e) {
     e.preventDefault();
-    if (e.type == 'touchmove') {
+    if (e.type === 'touchmove') {
       pos1 = pos3 - e.touches[0].clientX;
       pos2 = pos4 - e.touches[0].clientY;
       pos3 = e.touches[0].clientX;
@@ -78,11 +91,12 @@ function dragElement(element) {
   }
 
   function closeDragElement() {
-    document.onmouseup = null;
-    document.ontouchend = null; // for touch devices
-    document.onmousemove = null;
-    document.ontouchmove = null; // for touch devices
+    document.removeEventListener('mouseup', closeDragElement);
+    document.removeEventListener('touchend', closeDragElement);
+    document.removeEventListener('mousemove', elementDrag);
+    document.removeEventListener('touchmove', elementDrag);
   }
 }
 
+// applied the func to make the modal draggable
 dragElement(document.getElementById('modalContent'));
